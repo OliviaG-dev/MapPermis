@@ -1,46 +1,150 @@
-# Getting Started with Create React App
+# Map Permis
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Application web interactive de cartographie permettant de créer et d'éditer des éléments sur une carte OpenStreetMap. Développée avec React, TypeScript et Leaflet.
 
-## Available Scripts
+MapPermis est un outil moderne conçu pour t’aider à comprendre, visualiser et préparer les parcours du permis de conduire.
+Grâce à une carte interactive, tu peux tracer tes trajets, ajouter les priorités à droite, stops, dangers et toutes les zones clés d’un examen. L’objectif : rendre l’apprentissage de la conduite plus clair, plus efficace et plus personnalisé.
 
-In the project directory, you can run:
+Que tu sois élève, accompagnateur ou moniteur, MapPermis te permet de recréer fidèlement les itinéraires d’examen, d’annoter les points difficiles, et de t’entraîner en conditions réelles. Prépare ton permis en toute sérénité, avec une application pensée pour la pratique, la précision… et la réussite.
 
-### `npm start`
+## 🗺️ Fonctionnalités
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Carte interactive** : Visualisation de cartes OpenStreetMap avec zoom et navigation
+- **Dessin de marqueurs** : Ajout de marqueurs personnalisés avec différentes icônes selon le contexte
+- **Dessin de polylignes** : Création de lignes et de tracés sur la carte
+- **Édition** : Modification et suppression des éléments dessinés
+- **Marqueurs personnalisés** :
+  - **Danger** : Clic normal
+  - **Priorité** : SHIFT + Clic
+  - **Stop** : CTRL + Clic
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🚀 Technologies utilisées
 
-### `npm test`
+- **React 19** : Bibliothèque JavaScript pour l'interface utilisateur
+- **TypeScript** : Typage statique pour JavaScript
+- **Leaflet** : Bibliothèque open-source pour les cartes interactives
+- **React-Leaflet** : Composants React pour Leaflet
+- **Leaflet-Draw** : Plugin Leaflet pour le dessin et l'édition de formes
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📋 Prérequis
 
-### `npm run build`
+- Node.js (version 14 ou supérieure)
+- npm ou yarn
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🔧 Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clonez le dépôt :
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+git clone <url-du-depot>
+cd map-permis
+```
 
-### `npm run eject`
+2. Installez les dépendances :
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm install
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🎯 Utilisation
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Démarrage en mode développement
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Lancez l'application en mode développement :
 
-## Learn More
+```bash
+npm start
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+L'application sera accessible à l'adresse [http://localhost:3000](http://localhost:3000)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Construction pour la production
+
+Créez une version optimisée pour la production :
+
+```bash
+npm run build
+```
+
+Les fichiers de production seront générés dans le dossier `build/`.
+
+### Tests
+
+Lancez les tests :
+
+```bash
+npm test
+```
+
+## 📖 Guide d'utilisation
+
+### Ajouter un marqueur
+
+1. Cliquez sur l'icône de marqueur dans la barre d'outils (en haut à droite)
+2. Cliquez sur la carte pour placer le marqueur
+3. Utilisez les raccourcis clavier pour changer le type de marqueur :
+   - **Clic normal** : Marqueur de danger
+   - **SHIFT + Clic** : Marqueur de priorité
+   - **CTRL + Clic** : Marqueur de stop
+
+### Dessiner une polyligne
+
+1. Cliquez sur l'icône de ligne dans la barre d'outils
+2. Cliquez sur la carte pour commencer le tracé
+3. Cliquez à nouveau pour ajouter des points
+4. Double-cliquez pour terminer le tracé
+
+### Modifier ou supprimer un élément
+
+1. Cliquez sur l'icône d'édition dans la barre d'outils
+2. Sélectionnez un élément sur la carte
+3. Modifiez sa position ou supprimez-le
+
+## 📁 Structure du projet
+
+```
+map-permis/
+├── public/              # Fichiers statiques
+├── src/
+│   ├── components/      # Composants React
+│   │   └── MapEditor/
+│   │       ├── MapEditor.tsx
+│   │       └── MapEditor.css
+│   ├── pages/          # Pages de l'application
+│   │   └── Home/
+│   │       ├── Home.tsx
+│   │       └── Home.css
+│   ├── App.tsx         # Composant principal
+git init│   ├── App.css         # Styles de l'application
+│   └── index.tsx       # Point d'entrée
+├── package.json
+└── README.md
+```
+
+## 🛠️ Scripts disponibles
+
+- `npm start` : Lance l'application en mode développement
+- `npm run build` : Construit l'application pour la production
+- `npm test` : Lance les tests
+- `npm run eject` : Éjecte la configuration (opération irréversible)
+
+## 📝 Notes
+
+- L'application utilise les tuiles OpenStreetMap pour l'affichage des cartes
+- Les icônes des marqueurs sont chargées depuis Flaticon
+- La carte est centrée par défaut sur Paris (48.8566, 2.3522)
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
+
+## 📄 Licence
+
+Ce projet est privé.
+
+## 🔗 Ressources
+
+- [React Documentation](https://reactjs.org/)
+- [Leaflet Documentation](https://leafletjs.com/)
+- [React-Leaflet Documentation](https://react-leaflet.js.org/)
+- [Leaflet-Draw Documentation](https://github.com/Leaflet/Leaflet.draw)
