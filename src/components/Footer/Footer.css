@@ -1,0 +1,14 @@
+/* Styles pour le composant Footer */
+
+.footer {
+  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  color: white;
+  text-align: center;
+  padding: 40px 24px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.footer p {
+  margin: 0;
+}

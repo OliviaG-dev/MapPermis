@@ -115,7 +115,7 @@ map-permis/
 │   │       ├── Home.tsx
 │   │       └── Home.css
 │   ├── App.tsx         # Composant principal
-git init│   ├── App.css         # Styles de l'application
+│   ├── App.css         # Styles de l'application
 │   └── index.tsx       # Point d'entrée
 ├── package.json
 └── README.md
