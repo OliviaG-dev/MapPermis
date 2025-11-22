@@ -8,6 +8,8 @@ interface Parcours {
   id: string;
   name: string;
   description: string;
+  city?: string;
+  mapData?: any;
   createdAt: string;
 }
 
@@ -87,7 +89,7 @@ export default function ViewParcours() {
                   <span className="parcours-date">
                     Créé le {formatDate(p.createdAt)}
                   </span>
-                  <button className="btn-view" onClick={() => navigate("/")}>
+                  <button className="btn-view" onClick={() => navigate(`/parcours/${p.id}`)}>
                     Ouvrir sur la carte
                   </button>
                 </div>

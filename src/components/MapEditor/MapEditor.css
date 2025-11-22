@@ -1,2 +1,311 @@
 /* Styles pour le composant MapEditor */
 
+.map-editor-container {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.city-search-overlay {
+  position: absolute;
+  top: 36px;
+  left: 80px;
+  z-index: 1000;
+  max-width: 350px;
+  width: calc(100% - 96px);
+}
+
+.city-search-container {
+  position: relative;
+  width: 100%;
+}
+
+.city-search-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.city-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  padding-right: 40px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
+  outline: none;
+}
+
+.city-search-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+
+.city-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.city-search-loader {
+  position: absolute;
+  right: 12px;
+  color: #10b981;
+  font-size: 18px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.city-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1001;
+}
+
+.city-search-result-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.city-search-result-item:last-child {
+  border-bottom: none;
+}
+
+.city-search-result-item:hover {
+  background-color: #f9fafb;
+}
+
+.city-search-result-item strong {
+  display: block;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.city-search-result-details {
+  display: block;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Scrollbar pour les résultats */
+.city-search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.city-search-results::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.city-search-results::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.city-search-results::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Barre d'outils des marqueurs */
+.marker-toolbar {
+  position: absolute;
+  top: 36px;
+  right: 120px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  background: white;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.marker-toolbar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 70px;
+}
+
+.marker-toolbar-btn:hover {
+  border-color: #10b981;
+  background: #f0fdf4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+}
+
+.marker-toolbar-btn.active {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.marker-toolbar-btn img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.marker-toolbar-btn.active img {
+  filter: brightness(0) invert(1);
+}
+
+.marker-toolbar-btn.active img.priority-icon {
+  filter: none;
+}
+
+.marker-toolbar-btn span {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: #475569;
+}
+
+.marker-toolbar-btn.active span {
+  color: white;
+}
+
+.marker-toolbar-btn:hover span {
+  color: #10b981;
+}
+
+.marker-toolbar-btn.active:hover span {
+  color: white;
+}
+
+/* Icônes personnalisées */
+.custom-stop-icon,
+.custom-zone30-icon,
+.custom-finzone30-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Déplacer le contrôle d'édition Leaflet Draw plus bas pour éviter qu'il soit caché par la barre d'outils */
+.leaflet-draw.leaflet-control {
+  margin-top: 100px !important;
+}
+
+.leaflet-draw-toolbar {
+  margin-top: 0 !important;
+}
+
+/* Style pour le bouton de suppression des marqueurs */
+.marker-delete-button {
+  background: transparent !important;
+  border: none !important;
+}
+
+.leaflet-marker-icon.marker-delete-button {
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.leaflet-marker-icon.marker-delete-button:hover {
+  z-index: 1001 !important;
+}
+
+/* Style pour le div à l'intérieur du bouton de suppression */
+.marker-delete-button > div {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Style pour améliorer la visibilité des polylines sélectionnées */
+.leaflet-interactive {
+  cursor: pointer !important;
+}
+
+.leaflet-polyline {
+  cursor: pointer !important;
+  pointer-events: all !important;
+}
+
+.leaflet-draw-edit-edit .leaflet-clickable {
+  cursor: pointer;
+}
+
+/* Améliorer la visibilité des handles d'édition des polylines */
+.leaflet-draw-edit-edit .leaflet-edit-marker-selected,
+.leaflet-draw-edit-edit .leaflet-edit-selected {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Style pour les polylines dans le groupe drawnItems */
+.leaflet-draw-edit-edit .leaflet-clickable:hover {
+  stroke-width: 6 !important;
+  opacity: 0.8 !important;
+}
+
+/* Améliorer la visibilité des polylines pour qu'elles soient plus faciles à cliquer */
+.leaflet-draw-edit-edit path.leaflet-interactive {
+  stroke-width: 5 !important;
+  opacity: 0.9 !important;
+}
+
+/* Améliorer la visibilité des segments pour faciliter l'ajout de points */
+.leaflet-draw-edit-edit .leaflet-edit-selected {
+  stroke-width: 6 !important;
+}
+
+/* Style pour les handles (points) de la polyline en mode édition */
+.leaflet-edit-marker-icon,
+.leaflet-edit-move-icon,
+.leaflet-edit-remove-icon {
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+/* Zone cliquable plus large pour les segments */
+.leaflet-draw-edit-edit path {
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+/* Style pour les boutons de suppression des points de polyline */
+.polyline-handle-delete-btn {
+  background: transparent !important;
+  border: none !important;
+}
+
+.leaflet-marker-icon.polyline-handle-delete-btn {
+  cursor: pointer;
+  z-index: 1001 !important;
+}
+
+.leaflet-marker-icon.polyline-handle-delete-btn:hover {
+  z-index: 1002 !important;
+}
