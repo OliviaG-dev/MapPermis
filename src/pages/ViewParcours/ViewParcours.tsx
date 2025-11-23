@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import { useAlert } from "../../components/Alert/useAlert";
 import "./ViewParcours.css";
 
 interface Parcours {
@@ -16,6 +17,7 @@ interface Parcours {
 export default function ViewParcours() {
   const [parcours, setParcours] = useState<Parcours[]>([]);
   const navigate = useNavigate();
+  const { alert, showConfirm } = useAlert();
 
   useEffect(() => {
     // Charger les parcours depuis localStorage
@@ -23,8 +25,15 @@ export default function ViewParcours() {
     setParcours(storedParcours);
   }, []);
 
-  const handleDelete = (id: string) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce parcours ?")) {
+  const handleDelete = async (id: string) => {
+    const confirmed = await showConfirm({
+      title: "Supprimer le parcours",
+      message: "Êtes-vous sûr de vouloir supprimer ce parcours ?",
+      confirmText: "Supprimer",
+      cancelText: "Annuler",
+    });
+
+    if (confirmed) {
       const updatedParcours = parcours.filter((p) => p.id !== id);
       setParcours(updatedParcours);
       localStorage.setItem("parcours", JSON.stringify(updatedParcours));
@@ -99,6 +108,7 @@ export default function ViewParcours() {
         )}
       </div>
       <Footer />
+      {alert}
     </div>
   );
 }

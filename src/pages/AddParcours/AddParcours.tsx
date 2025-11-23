@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import MapEditor from "../../components/MapEditor/MapEditor";
+import { useAlert } from "../../components/Alert/useAlert";
 import "./AddParcours.css";
 
 export default function AddParcours() {
@@ -11,17 +12,23 @@ export default function AddParcours() {
   const [city, setCity] = useState("");
   const [mapData, setMapData] = useState<any>(null);
   const navigate = useNavigate();
+  const { alert, showAlert } = useAlert();
 
   const handleCityChange = (newCity: string) => {
     // Mettre à jour le champ ville lorsque l'utilisateur sélectionne une ville depuis la recherche sur la carte
     setCity(newCity);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!parcoursName.trim()) {
-      alert("Veuillez entrer un nom pour le parcours");
+      await showAlert({
+        type: "alert",
+        title: "Nom requis",
+        message: "Veuillez entrer un nom pour le parcours",
+        confirmText: "OK",
+      });
       return;
     }
 
@@ -42,7 +49,12 @@ export default function AddParcours() {
     existingParcours.push(parcours);
     localStorage.setItem("parcours", JSON.stringify(existingParcours));
 
-    alert("Parcours créé avec succès !");
+    await showAlert({
+      type: "success",
+      title: "Succès",
+      message: "Parcours créé avec succès !",
+      confirmText: "OK",
+    });
     navigate("/parcours");
   };
 
@@ -139,6 +151,7 @@ export default function AddParcours() {
         </div>
       </div>
       <Footer />
+      {alert}
     </div>
   );
 }

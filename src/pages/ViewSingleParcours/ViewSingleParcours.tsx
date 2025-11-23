@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import MapEditor from "../../components/MapEditor/MapEditor";
+import { useAlert } from "../../components/Alert/useAlert";
 import "./ViewSingleParcours.css";
 
 interface Parcours {
@@ -19,19 +20,30 @@ export default function ViewSingleParcours() {
   const navigate = useNavigate();
   const [parcours, setParcours] = useState<Parcours | null>(null);
   const [loading, setLoading] = useState(true);
+  const { alert, showAlert } = useAlert();
 
   useEffect(() => {
-    // Charger le parcours depuis localStorage
-    const storedParcours = JSON.parse(localStorage.getItem("parcours") || "[]");
-    const foundParcours = storedParcours.find((p: Parcours) => p.id === id);
+    const loadParcours = async () => {
+      // Charger le parcours depuis localStorage
+      const storedParcours = JSON.parse(localStorage.getItem("parcours") || "[]");
+      const foundParcours = storedParcours.find((p: Parcours) => p.id === id);
+      
+      if (foundParcours) {
+        setParcours(foundParcours);
+      } else {
+        await showAlert({
+          type: "alert",
+          title: "Parcours non trouvé",
+          message: "Le parcours demandé n'existe pas.",
+          confirmText: "OK",
+        });
+        navigate("/parcours");
+      }
+      setLoading(false);
+    };
     
-    if (foundParcours) {
-      setParcours(foundParcours);
-    } else {
-      alert("Parcours non trouvé");
-      navigate("/parcours");
-    }
-    setLoading(false);
+    loadParcours();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, navigate]);
 
   if (loading) {
@@ -89,6 +101,7 @@ export default function ViewSingleParcours() {
         </div>
       </div>
       <Footer />
+      {alert}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import * as L from "leaflet";
 import "leaflet-draw";
+import { useAlert } from "../Alert/useAlert";
 import "./MapEditor.css";
 
 // Créer une icône personnalisée pour le panneau stop (octogone rouge)
@@ -108,6 +109,7 @@ const iconFinZone30 = L.divIcon({
 });
 
 type MarkerType = "priority" | "stop" | "zone30" | "finZone30" | null;
+type DrawMode = "draw" | "edit" | null;
 
 interface MapEditorProps {
   initialCity?: string;
@@ -298,18 +300,30 @@ function LeafletDrawEditor({
   onMapDataChange,
   initialMapData,
   readOnly = false,
+  drawMode,
+  onDrawModeChange,
+  onEditorReady,
+  onClearRequest,
 }: {
   selectedMarkerType: MarkerType;
   onMarkerTypeChange: (type: MarkerType) => void;
   onMapDataChange?: (data: any) => void;
   initialMapData?: any;
   readOnly?: boolean;
+  drawMode?: DrawMode;
+  onDrawModeChange?: (mode: DrawMode) => void;
+  onEditorReady?: (actions: { save: () => void; clear: () => void }) => void;
+  onClearRequest?: () => Promise<boolean>;
 }) {
   const map = useMap();
   const drawnItemsRef = useRef(new L.FeatureGroup());
   const clickHandlerRef = useRef<((e: L.LeafletMouseEvent) => void) | null>(
     null
   );
+  const drawControlRef = useRef<L.Control.Draw | null>(null);
+  const drawHandlerRef = useRef<L.Draw.Polyline | null>(null);
+  const editHandlerRef = useRef<L.EditToolbar.Edit | null>(null);
+  const exportMapDataRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const drawnItems = drawnItemsRef.current;
@@ -366,6 +380,38 @@ function LeafletDrawEditor({
         onMapDataChange(data);
       }
     };
+
+    exportMapDataRef.current = exportMapData;
+
+    // Fonction pour vider la carte
+    const clearMap = async () => {
+      if (onClearRequest) {
+        const confirmed = await onClearRequest();
+        if (!confirmed) return;
+      }
+
+      drawnItems.eachLayer((layer: L.Layer) => {
+        map.removeLayer(layer);
+        // Supprimer aussi les boutons de suppression des marqueurs
+        if (layer instanceof L.Marker && (layer as any).deleteButton) {
+          map.removeLayer((layer as any).deleteButton);
+        }
+      });
+      drawnItems.clearLayers();
+
+      // Exporter les données vides après nettoyage
+      if (onMapDataChange) {
+        onMapDataChange({ markers: [], polylines: [] });
+      }
+    };
+
+    // Exposer les fonctions au composant parent
+    if (onEditorReady) {
+      onEditorReady({
+        save: exportMapData,
+        clear: clearMap,
+      });
+    }
 
     // Charger les données initiales si disponibles
     if (initialMapData) {
@@ -435,7 +481,7 @@ function LeafletDrawEditor({
       }
     }
 
-    // Tools
+    // Créer le contrôle Draw mais ne pas l'ajouter à la carte (on va le contrôler programmatiquement)
     const drawControl = new L.Control.Draw({
       position: "topright",
       draw: {
@@ -449,6 +495,7 @@ function LeafletDrawEditor({
           : {
               shapeOptions: {
                 weight: 4,
+                color: "#10b981",
               },
             },
       },
@@ -470,8 +517,18 @@ function LeafletDrawEditor({
           }),
     });
 
+    drawControlRef.current = drawControl;
+
+    // Créer les handlers pour le dessin et l'édition
     if (!readOnly) {
-      map.addControl(drawControl);
+      // Handler pour le dessin de polyline
+      map.on(L.Draw.Event.DRAWSTART, () => {
+        if (drawMode === "draw") {
+          // Le mode dessin est déjà activé
+        }
+      });
+
+      // Les événements DRAWSTOP et EDITSTOP seront gérés dans le useEffect
     }
 
     // Fonction pour ajouter des boutons de suppression aux points d'une polyline en mode édition
@@ -702,7 +759,7 @@ function LeafletDrawEditor({
 
     return () => {
       if (!readOnly) {
-        map.removeControl(drawControl);
+        // Ne pas retirer le contrôle, on l'utilise toujours
       }
       if (clickHandlerRef.current) {
         map.off("click", clickHandlerRef.current);
@@ -710,6 +767,88 @@ function LeafletDrawEditor({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, selectedMarkerType, onMarkerTypeChange, initialMapData, readOnly]);
+
+  // Gérer les changements de mode de dessin/édition
+  useEffect(() => {
+    if (readOnly) return;
+
+    const drawnItems = drawnItemsRef.current;
+
+    // Désactiver tous les modes d'abord
+    if (drawHandlerRef.current) {
+      try {
+        drawHandlerRef.current.disable();
+      } catch (e) {
+        // Ignorer les erreurs si le handler est déjà désactivé
+      }
+      drawHandlerRef.current = null;
+    }
+    if (editHandlerRef.current) {
+      try {
+        editHandlerRef.current.disable();
+      } catch (e) {
+        // Ignorer les erreurs si le handler est déjà désactivé
+      }
+      editHandlerRef.current = null;
+    }
+
+    // Écouter les événements pour désactiver le mode après création
+    const handleDrawStop = () => {
+      if (onDrawModeChange && drawMode === "draw") {
+        onDrawModeChange(null);
+      }
+    };
+
+    if (drawMode === "draw") {
+      // Activer le mode dessin
+      const drawHandler = new L.Draw.Polyline(map as any, {
+        shapeOptions: {
+          weight: 4,
+          color: "#10b981",
+        },
+      });
+
+      map.on(L.Draw.Event.DRAWSTOP, handleDrawStop);
+
+      drawHandler.enable();
+      drawHandlerRef.current = drawHandler;
+    } else if (drawMode === "edit") {
+      // Activer le mode édition
+      const editHandler = new (L as any).EditToolbar.Edit(map, {
+        featureGroup: drawnItems,
+        remove: false,
+        edit: {
+          selectedPathOptions: {
+            color: "#10b981",
+            weight: 5,
+            opacity: 0.9,
+            dashArray: "10, 5",
+          },
+        },
+      });
+      editHandler.enable();
+      editHandlerRef.current = editHandler;
+    }
+
+    return () => {
+      map.off(L.Draw.Event.DRAWSTOP, handleDrawStop);
+      if (drawHandlerRef.current) {
+        try {
+          drawHandlerRef.current.disable();
+        } catch (e) {
+          // Ignorer les erreurs
+        }
+      }
+      if (editHandlerRef.current) {
+        try {
+          editHandlerRef.current.disable();
+        } catch (e) {
+          // Ignorer les erreurs
+        }
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, drawMode, readOnly]);
 
   return null;
 }
@@ -767,7 +906,7 @@ function CitySearch({ onSearch }: { onSearch: (city: string) => void }) {
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
-    
+
     // Annuler le timer précédent
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -857,7 +996,14 @@ export default function MapEditor({
   const [mapZoom, setMapZoom] = useState(14);
   const [selectedMarkerType, setSelectedMarkerType] =
     useState<MarkerType>(null);
+  const [drawMode, setDrawMode] = useState<DrawMode>(null);
+  const [isLocked, setIsLocked] = useState(false);
   const lastGeocodedCityRef = useRef<string>("");
+  const editorActionsRef = useRef<{
+    save: () => void;
+    clear: () => void;
+  } | null>(null);
+  const { alert, showConfirm } = useAlert();
 
   const geocodeAndCenter = async (city: string) => {
     // Éviter de géocoder la même ville plusieurs fois
@@ -930,7 +1076,20 @@ export default function MapEditor({
           onMarkerTypeChange={setSelectedMarkerType}
           onMapDataChange={onMapDataChange}
           initialMapData={initialMapData}
-          readOnly={readOnly}
+          readOnly={readOnly || isLocked}
+          drawMode={drawMode}
+          onDrawModeChange={setDrawMode}
+          onEditorReady={(actions) => {
+            editorActionsRef.current = actions;
+          }}
+          onClearRequest={async () => {
+            return await showConfirm({
+              title: "Effacer la carte",
+              message: "Êtes-vous sûr de vouloir tout supprimer ?",
+              confirmText: "Effacer",
+              cancelText: "Annuler",
+            });
+          }}
         />
       </MapContainer>
       {!readOnly && (
@@ -942,14 +1101,84 @@ export default function MapEditor({
         <div className="marker-toolbar">
           <button
             className={`marker-toolbar-btn ${
-              selectedMarkerType === "priority" ? "active" : ""
+              drawMode === "draw" ? "active" : ""
+            } ${isLocked ? "disabled" : ""}`}
+            onClick={() => {
+              if (!isLocked) {
+                if (drawMode === "draw") {
+                  setDrawMode(null);
+                  setSelectedMarkerType(null);
+                } else {
+                  setDrawMode("draw");
+                  setSelectedMarkerType(null);
+                }
+              }
+            }}
+            title="Tracer un parcours"
+            disabled={isLocked}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+            </svg>
+            <span>Tracer</span>
+          </button>
+          <button
+            className={`marker-toolbar-btn ${
+              drawMode === "edit" ? "active" : ""
             }`}
-            onClick={() =>
-              setSelectedMarkerType(
-                selectedMarkerType === "priority" ? null : "priority"
-              )
-            }
+            onClick={() => {
+              if (drawMode === "edit") {
+                setDrawMode(null);
+                setIsLocked(false);
+              } else {
+                setDrawMode("edit");
+                setSelectedMarkerType(null);
+                if (isLocked) {
+                  setIsLocked(false);
+                }
+              }
+            }}
+            title="Modifier un parcours"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            <span>Modifier</span>
+          </button>
+          <div className="marker-toolbar-divider"></div>
+          <button
+            className={`marker-toolbar-btn ${
+              selectedMarkerType === "priority" ? "active" : ""
+            } ${isLocked ? "disabled" : ""}`}
+            onClick={() => {
+              if (!isLocked) {
+                setSelectedMarkerType(
+                  selectedMarkerType === "priority" ? null : "priority"
+                );
+                setDrawMode(null);
+              }
+            }}
             title="Priorité"
+            disabled={isLocked}
           >
             <img
               className="priority-icon"
@@ -961,13 +1190,17 @@ export default function MapEditor({
           <button
             className={`marker-toolbar-btn ${
               selectedMarkerType === "stop" ? "active" : ""
-            }`}
-            onClick={() =>
-              setSelectedMarkerType(
-                selectedMarkerType === "stop" ? null : "stop"
-              )
-            }
+            } ${isLocked ? "disabled" : ""}`}
+            onClick={() => {
+              if (!isLocked) {
+                setSelectedMarkerType(
+                  selectedMarkerType === "stop" ? null : "stop"
+                );
+                setDrawMode(null);
+              }
+            }}
             title="Stop"
+            disabled={isLocked}
           >
             <svg
               width="24"
@@ -1003,13 +1236,17 @@ export default function MapEditor({
           <button
             className={`marker-toolbar-btn ${
               selectedMarkerType === "zone30" ? "active" : ""
-            }`}
-            onClick={() =>
-              setSelectedMarkerType(
-                selectedMarkerType === "zone30" ? null : "zone30"
-              )
-            }
+            } ${isLocked ? "disabled" : ""}`}
+            onClick={() => {
+              if (!isLocked) {
+                setSelectedMarkerType(
+                  selectedMarkerType === "zone30" ? null : "zone30"
+                );
+                setDrawMode(null);
+              }
+            }}
             title="Zone 30"
+            disabled={isLocked}
           >
             <svg
               width="24"
@@ -1042,13 +1279,17 @@ export default function MapEditor({
           <button
             className={`marker-toolbar-btn ${
               selectedMarkerType === "finZone30" ? "active" : ""
-            }`}
-            onClick={() =>
-              setSelectedMarkerType(
-                selectedMarkerType === "finZone30" ? null : "finZone30"
-              )
-            }
+            } ${isLocked ? "disabled" : ""}`}
+            onClick={() => {
+              if (!isLocked) {
+                setSelectedMarkerType(
+                  selectedMarkerType === "finZone30" ? null : "finZone30"
+                );
+                setDrawMode(null);
+              }
+            }}
             title="Fin Zone 30"
+            disabled={isLocked}
           >
             <svg
               width="24"
@@ -1087,8 +1328,67 @@ export default function MapEditor({
             </svg>
             <span>Fin Zone 30</span>
           </button>
+          <div className="marker-toolbar-divider"></div>
+          <button
+            className="marker-toolbar-btn"
+            onClick={() => {
+              if (editorActionsRef.current) {
+                editorActionsRef.current.save();
+                setIsLocked(true);
+                setSelectedMarkerType(null);
+                setDrawMode(null);
+              }
+            }}
+            title="Sauvegarder"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            <span>Sauver</span>
+          </button>
+          <button
+            className="marker-toolbar-btn"
+            onClick={() => {
+              if (editorActionsRef.current) {
+                editorActionsRef.current.clear();
+                setIsLocked(false);
+                setSelectedMarkerType(null);
+                setDrawMode(null);
+              }
+            }}
+            title="Effacer tout"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+            <span>Clear</span>
+          </button>
         </div>
       )}
+      {alert}
     </div>
   );
 }

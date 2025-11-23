@@ -135,10 +135,11 @@
 .marker-toolbar {
   position: absolute;
   top: 36px;
-  right: 120px;
-  z-index: 1000;
+  right: 20px;
+  z-index: 2000;
   display: flex;
   gap: 8px;
+  align-items: center;
   background: white;
   padding: 8px;
   border-radius: 12px;
@@ -171,6 +172,21 @@
   background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.marker-toolbar-btn.disabled,
+.marker-toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.marker-toolbar-btn.disabled:hover,
+.marker-toolbar-btn:disabled:hover {
+  border-color: #e5e7eb;
+  background: white;
+  transform: none;
+  box-shadow: none;
 }
 
 .marker-toolbar-btn img {
@@ -206,6 +222,33 @@
   color: white;
 }
 
+.marker-toolbar-divider {
+  width: 1px;
+  background: #e5e7eb;
+  margin: 4px 0;
+  align-self: stretch;
+}
+
+.marker-toolbar-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  fill: none;
+  color: #475569;
+}
+
+.marker-toolbar-btn.active svg {
+  color: white;
+}
+
+.marker-toolbar-btn:hover svg {
+  color: #10b981;
+}
+
+.marker-toolbar-btn.active:hover svg {
+  color: white;
+}
+
 /* Icônes personnalisées */
 .custom-stop-icon,
 .custom-zone30-icon,
@@ -214,13 +257,12 @@
   border: none !important;
 }
 
-/* Déplacer le contrôle d'édition Leaflet Draw plus bas pour éviter qu'il soit caché par la barre d'outils */
+/* Masquer les contrôles Leaflet Draw par défaut (on utilise nos boutons personnalisés) */
 .leaflet-draw.leaflet-control {
-  margin-top: 100px !important;
-}
-
-.leaflet-draw-toolbar {
-  margin-top: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* Style pour le bouton de suppression des marqueurs */
