@@ -17,12 +17,16 @@ interface AlertHookReturn {
 
 export function useAlert(): AlertHookReturn {
   const [isOpen, setIsOpen] = useState(false);
-  const [alertOptions, setAlertOptions] = useState<AlertOptions & { type: AlertType }>({
+  const [alertOptions, setAlertOptions] = useState<
+    AlertOptions & { type: AlertType }
+  >({
     type: "alert",
     title: "",
     message: "",
   });
-  const [resolvePromise, setResolvePromise] = useState<((value: boolean) => void) | null>(null);
+  const [resolvePromise, setResolvePromise] = useState<
+    ((value: boolean) => void) | null
+  >(null);
 
   const showAlert = useCallback((options: AlertOptions): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -87,4 +91,3 @@ export function useAlert(): AlertHookReturn {
     showConfirm,
   };
 }
-
