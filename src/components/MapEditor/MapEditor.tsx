@@ -735,6 +735,7 @@ function CitySearch({ onSearch }: { onSearch: (city: string) => void }) {
   const [results, setResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const geocodeCity = async (city: string) => {
     if (!city.trim()) {
@@ -766,8 +767,17 @@ function CitySearch({ onSearch }: { onSearch: (city: string) => void }) {
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
+    
+    // Annuler le timer précédent
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
     if (value.length >= 3) {
-      geocodeCity(value);
+      // Débounce : attendre 500ms après que l'utilisateur arrête de taper
+      debounceTimerRef.current = setTimeout(() => {
+        geocodeCity(value);
+      }, 500);
     } else {
       setResults([]);
       setShowResults(false);
@@ -780,6 +790,25 @@ function CitySearch({ onSearch }: { onSearch: (city: string) => void }) {
     onSearch(result);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && results.length > 0) {
+      // Sélectionner automatiquement le premier résultat avec Entrée
+      e.preventDefault();
+      handleSelect(results[0]);
+    } else if (e.key === "Escape") {
+      setShowResults(false);
+    }
+  };
+
+  // Nettoyer le timer au démontage
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="city-search-container">
       <div className="city-search-input-wrapper">
@@ -789,6 +818,7 @@ function CitySearch({ onSearch }: { onSearch: (city: string) => void }) {
           placeholder="Rechercher une ville..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setShowResults(true)}
           onBlur={() => setTimeout(() => setShowResults(false), 200)}
         />

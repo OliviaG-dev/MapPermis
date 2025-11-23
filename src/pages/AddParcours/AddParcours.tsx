@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -9,37 +9,13 @@ export default function AddParcours() {
   const [parcoursName, setParcoursName] = useState("");
   const [description, setDescription] = useState("");
   const [city, setCity] = useState("");
-  const [cityToCenter, setCityToCenter] = useState("");
   const [mapData, setMapData] = useState<any>(null);
   const navigate = useNavigate();
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCityChange = (newCity: string) => {
-    // Ne mettre à jour le champ ville que si l'utilisateur a sélectionné depuis la recherche sur la carte
-    // Ne pas mettre à jour si c'est juste un géocodage automatique
+    // Mettre à jour le champ ville lorsque l'utilisateur sélectionne une ville depuis la recherche sur la carte
     setCity(newCity);
   };
-
-  // Debounce pour synchroniser le champ ville avec la carte
-  useEffect(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    if (city.trim().length >= 3) {
-      debounceTimerRef.current = setTimeout(() => {
-        // Utiliser une copie pour éviter les conflits
-        const cityValue = city;
-        setCityToCenter(cityValue);
-      }, 800); // Attend 800ms après que l'utilisateur arrête de taper
-    }
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, [city]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,12 +70,13 @@ export default function AddParcours() {
               <input
                 type="text"
                 id="city"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Ex: Paris, Lyon, Marseille..."
+                value={city || "-----"}
+                readOnly
+                className="city-input-readonly"
+                placeholder="Utilisez la recherche sur la carte pour sélectionner une ville"
               />
               <small className="form-hint">
-                Indiquez la ville pour centrer la carte dessus (la carte se mettra à jour automatiquement). Vous pouvez aussi utiliser la recherche directement sur la carte.
+                La ville est automatiquement remplie lorsque vous utilisez la recherche sur la carte.
               </small>
             </div>
 
@@ -155,7 +132,7 @@ export default function AddParcours() {
 
         <div className="add-parcours-map">
           <MapEditor 
-            initialCity={cityToCenter || city} 
+            initialCity={city} 
             onCityChange={handleCityChange}
             onMapDataChange={setMapData}
           />

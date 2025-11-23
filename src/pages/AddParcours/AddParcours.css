@@ -58,6 +58,22 @@
   background-color: white;
 }
 
+.form-group input.city-input-readonly {
+  background-color: #f8fafc;
+  cursor: not-allowed;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  color: #475569;
+}
+
+.form-group input.city-input-readonly:focus {
+  border-color: #e2e8f0;
+  box-shadow: none;
+  outline: none;
+}
+
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
