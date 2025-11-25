@@ -4,7 +4,9 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  min-height: 100vh;
   width: 100%;
+  background: #f8fafc;
 }
 
 .add-parcours-content {
@@ -160,6 +162,65 @@
 .add-parcours-map {
   flex: 1;
   height: 100%;
+}
+
+@media (max-width: 1024px) {
+  .add-parcours-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .add-parcours-content {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .add-parcours-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: none;
+  }
+
+  .add-parcours-map {
+    height: 500px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .add-parcours-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .add-parcours-content {
+    overflow: visible;
+  }
+
+  .add-parcours-sidebar {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .add-parcours-map {
+    height: 450px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  .add-parcours-sidebar {
+    padding: 12px;
+  }
+
+  .add-parcours-map {
+    height: 400px;
+    width: 100%;
+  }
 }
 
 /* Styles discrets pour Header et Footer dans AddParcours */

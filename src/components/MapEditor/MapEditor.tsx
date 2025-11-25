@@ -5,6 +5,22 @@ import "leaflet-draw";
 import { useAlert } from "../Alert/useAlert";
 import "./MapEditor.css";
 
+const TRACE_STYLE: L.PolylineOptions = {
+  color: "#f97316",
+  weight: 6,
+  opacity: 0.95,
+  lineCap: "round",
+  lineJoin: "round",
+  className: "map-editor-trace",
+};
+
+const TRACE_SELECTED_STYLE: L.PathOptions = {
+  color: "#fb923c",
+  weight: 7,
+  opacity: 1,
+  dashArray: "12, 6",
+};
+
 // Créer une icône personnalisée pour le panneau stop (octogone rouge)
 const iconStop = L.divIcon({
   className: "custom-stop-icon",
@@ -461,7 +477,7 @@ function LeafletDrawEditor({
 
             if (points.length > 0) {
               const polyline = L.polyline(points, {
-                weight: 4,
+                ...TRACE_STYLE,
                 interactive: !readOnly,
               });
 
@@ -494,8 +510,7 @@ function LeafletDrawEditor({
           ? false
           : {
               shapeOptions: {
-                weight: 4,
-                color: "#10b981",
+                ...TRACE_STYLE,
               },
             },
       },
@@ -507,10 +522,7 @@ function LeafletDrawEditor({
               remove: false, // Désactiver la suppression au clic direct
               edit: {
                 selectedPathOptions: {
-                  color: "#10b981",
-                  weight: 5,
-                  opacity: 0.9,
-                  dashArray: "10, 5",
+                  ...TRACE_SELECTED_STYLE,
                 },
               },
             },
@@ -803,8 +815,7 @@ function LeafletDrawEditor({
       // Activer le mode dessin
       const drawHandler = new L.Draw.Polyline(map as any, {
         shapeOptions: {
-          weight: 4,
-          color: "#10b981",
+          ...TRACE_STYLE,
         },
       });
 
@@ -819,10 +830,7 @@ function LeafletDrawEditor({
         remove: false,
         edit: {
           selectedPathOptions: {
-            color: "#10b981",
-            weight: 5,
-            opacity: 0.9,
-            dashArray: "10, 5",
+            ...TRACE_SELECTED_STYLE,
           },
         },
       });

@@ -102,3 +102,52 @@
   height: 100%;
 }
 
+@media (max-width: 1024px) {
+  .view-single-parcours-content {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .view-single-parcours-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: none;
+  }
+
+  .view-single-parcours-map {
+    height: 500px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .view-single-parcours-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .view-single-parcours-content {
+    overflow: visible;
+  }
+
+  .view-single-parcours-sidebar {
+    padding: 16px;
+  }
+
+  .view-single-parcours-map {
+    height: 450px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  .view-single-parcours-sidebar {
+    padding: 12px;
+  }
+
+  .view-single-parcours-map {
+    height: 400px;
+    width: 100%;
+  }
+}

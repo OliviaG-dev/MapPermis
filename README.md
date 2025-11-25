@@ -12,6 +12,7 @@ Que tu sois élève, accompagnateur ou moniteur, MapPermis te permet de recréer
 - **💾 Système de sauvegarde amélioré** : Bouton "Sauver" avec verrouillage automatique de la carte
 - **🗑️ Effacement intelligent** : Bouton "Clear" avec confirmation avant suppression
 - **🔍 Recherche de ville améliorée** : Recherche automatique avec debounce et suggestions en temps réel
+- **📱 Expérience mobile renforcée** : MapEditor et AddParcours optimisés sur tablette/mobile (champ de recherche épinglé en haut, toolbar mobile, contrôles de zoom placés sous le header)
 - **📱 Composants d'alerte personnalisés** : Remplacement des alertes natives par des popups stylisées
 - **🔒 Mode verrouillage** : Protection contre les modifications accidentelles après sauvegarde
 

@@ -337,6 +337,20 @@
   stroke-linejoin: round !important;
 }
 
+.map-editor-trace {
+  stroke: #f97316 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
+    drop-shadow(0 0 2px rgba(15, 23, 42, 0.55));
+}
+
+.map-editor-trace:hover {
+  stroke: #fb923c !important;
+  filter: drop-shadow(0 0 10px rgba(251, 146, 60, 0.75))
+    drop-shadow(0 0 4px rgba(15, 23, 42, 0.6));
+}
+
 /* Style pour les boutons de suppression des points de polyline */
 .polyline-handle-delete-btn {
   background: transparent !important;
@@ -350,4 +364,115 @@
 
 .leaflet-marker-icon.polyline-handle-delete-btn:hover {
   z-index: 1002 !important;
+}
+
+.map-editor-container .leaflet-top.leaflet-left {
+  top: 96px;
+}
+
+@media (max-width: 768px) {
+  .map-editor-container .leaflet-top.leaflet-left {
+    top: 120px;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .map-editor-container {
+    padding: 12px;
+  }
+
+  .city-search-overlay {
+    top: 20px;
+    left: 20px;
+    max-width: calc(100% - 40px);
+  }
+
+  .marker-toolbar {
+    top: auto;
+    bottom: 24px;
+    right: 20px;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .marker-toolbar-btn {
+    min-width: 60px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-editor-container {
+    padding: 8px;
+    height: calc(100vh - 16px);
+  }
+
+  .city-search-overlay {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 520px;
+    margin-bottom: 0;
+    z-index: 2000;
+  }
+
+  .marker-toolbar {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    justify-content: space-between;
+    overflow-x: auto;
+    padding: 8px;
+    border-radius: 16px;
+  }
+
+  .marker-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .marker-toolbar-btn {
+    flex: 0 0 auto;
+    min-width: 64px;
+    padding: 6px;
+  }
+
+  .marker-toolbar-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 540px) {
+  .city-search-overlay {
+    top: 8px;
+    width: calc(100% - 24px);
+  }
+
+  .city-search-input {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .marker-toolbar {
+    bottom: 8px;
+    width: calc(100% - 16px);
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .marker-toolbar-btn {
+    min-width: 56px;
+    padding: 4px;
+    gap: 2px;
+  }
+
+  .marker-toolbar-btn span {
+    font-size: 10px;
+  }
 }
